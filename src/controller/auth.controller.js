@@ -43,15 +43,15 @@ const signup = asyncHandler(async (req, res) => {
     password,
   });
 
-try {
+  try {
     await upertStreamUser({
-    id: newUser._id.toString(),
-    name: newUser.fullName,
-    image:""
-  })
-} catch (error) {
-  console.error("Error upserting user to Stream:", error);
-}
+      id: newUser._id.toString(),
+      name: newUser.fullName,
+      image: "",
+    });
+  } catch (error) {
+    console.error("Error upserting user to Stream:", error);
+  }
 
   const createdUser = await User.findById(newUser._id).select(
     "-password -refreshToken",
@@ -88,15 +88,13 @@ const login = asyncHandler(async (req, res) => {
     await generateAccessTokenAndRefreshToken(user._id);
 
   const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
-  console.log(loggedInUser.refreshToken);
-  
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "lax",
   };
 
   return res
@@ -105,25 +103,32 @@ const login = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .json(
       new ApiResponse(
-        200, "Login successfully", {
-        user: loggedInUser,
-        accessToken,
-        refreshToken,
-      }),
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "Login successfully",
+      ),
     );
 });
 
 const logout = asyncHandler(async (req, res) => {
-  console.log(req.user,"erersf");
-  
-  await User.findByIdAndUpdate(req.user._id,
-    {$unset: { refreshToken: 1 },},
-    { new: true,},
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: {
+        refreshToken: 1,
+      },
+    },
+    { new: true },
   );
 
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "lax",
   };
 
   return res
@@ -133,4 +138,57 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Logout successfully"));
 });
 
-export { signup, login, logout };
+const onboard = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const { fullName, bio, nativeLanguage, learningLanguage, location } =
+      req.body;
+
+    const missingFields = [];
+
+    if (!fullName) missingFields.push("fullName");
+    if (!bio) missingFields.push("bio");
+    if (!nativeLanguage) missingFields.push("nativeLanguage");
+    if (!learningLanguage) missingFields.push("learningLanguage");
+    if (!location) missingFields.push("location");
+
+    if (missingFields.length > 0) {
+      throw new apiError(400, `Missing fields: ${missingFields.join(", ")}`);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...req.body,
+        isOnboarded: true,
+      },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new apiError(500, "Failed to update user");
+    }
+    //update user in stream
+ 
+    try {
+      upertStreamUser({
+        id: updatedUser._id.toString(),
+        name: updatedUser.fullName,
+        image: "",
+      });
+    } catch (error) {
+      new apiError(500, "Failed to update user in Stream");
+    }
+
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedUser, "User onboarded successfully"));
+  } catch (error) {
+ 
+    throw new apiError(500, error.message);
+  }
+});
+
+export { signup, login, logout, onboard };

@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config();
-
 import { StreamChat } from "stream-chat";
 
-const apiSecret = process.env.STEAM_API_SECRET_KEY;
-const apiKey = process.env.STEAM_API_KEY;
+dotenv.config();
+const apiSecret = process.env.STREAM_API_SECRET;
+const apiKey = process.env.STREAM_API_KEY;
 
 
 if (!apiSecret || !apiKey) {
@@ -14,6 +13,7 @@ if (!apiSecret || !apiKey) {
 }
 
 const streamCLient = StreamChat.getInstance(apiKey, apiSecret);
+console.log(streamCLient);
 
 export const upertStreamUser = async (userData) => {
   try {
