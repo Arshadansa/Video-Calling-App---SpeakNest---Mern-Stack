@@ -170,7 +170,7 @@ const onboard = asyncHandler(async (req, res) => {
       throw new apiError(500, "Failed to update user");
     }
     //update user in stream
- 
+
     try {
       upertStreamUser({
         id: updatedUser._id.toString(),
@@ -181,12 +181,10 @@ const onboard = asyncHandler(async (req, res) => {
       new apiError(500, "Failed to update user in Stream");
     }
 
-
     return res
       .status(200)
       .json(new ApiResponse(200, updatedUser, "User onboarded successfully"));
   } catch (error) {
- 
     throw new apiError(500, error.message);
   }
 });
