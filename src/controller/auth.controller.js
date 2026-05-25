@@ -52,6 +52,8 @@ const signup = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Error upserting user to Stream:", error);
   }
+ const { accessToken, refreshToken } =
+    await generateAccessTokenAndRefreshToken(newUser._id);
 
   const createdUser = await User.findById(newUser._id).select(
     "-password -refreshToken",
@@ -60,9 +62,17 @@ const signup = asyncHandler(async (req, res) => {
   if (!createdUser) {
     throw new apiError(500, "Failed to create user");
   }
+  const options = {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  };
+
 
   return res
     .status(201)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
     .json(new ApiResponse(200, "User created successfully", createdUser));
 });
 
@@ -93,7 +103,7 @@ const login = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "lax",
   };
 
