@@ -8,7 +8,7 @@ const apiKey = process.env.STREAM_API_KEY;
 
 if (!apiSecret || !apiKey) {
   console.error(
-    "STEAM_API_SECRET_KEY and STEAM_API_KEY must be defined in environment variables",
+    "STREAM_API_SECRET_KEY and STREAM_API_KEY must be defined in environment variables",
   );
 }
 

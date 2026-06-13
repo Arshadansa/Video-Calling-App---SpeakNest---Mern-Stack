@@ -119,6 +119,7 @@ const acceptFriendRequest = asyncHandler(async (req, res) => {
   try {
     const { id: recipientId } = req.params;
 
+
     const friendRequest = await FriendRequest.findById(recipientId);
 
     if (!friendRequest) {
