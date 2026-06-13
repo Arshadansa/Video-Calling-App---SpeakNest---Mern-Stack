@@ -62,12 +62,11 @@ const signup = asyncHandler(async (req, res) => {
   if (!createdUser) {
     throw new apiError(500, "Failed to create user");
   }
-  const options = {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-  };
-
+ const options = {
+  httpOnly: true,
+  secure: true,        // MUST be true in production HTTPS
+  sameSite: "none",    // REQUIRED for cross-site cookies
+};
 
   return res
     .status(201)
