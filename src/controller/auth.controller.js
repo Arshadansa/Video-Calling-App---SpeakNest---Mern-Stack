@@ -136,8 +136,8 @@ const logout = asyncHandler(async (req, res) => {
 
  const options = {
   httpOnly: true,
-  secure: true,      
-  sameSite: "none",    
+  secure: true,        // ✅ Change false → true (HTTPS required)
+  sameSite: "none",    // ✅ Change "lax" → "none" (cross-site cookies)
 };
 
   return res
