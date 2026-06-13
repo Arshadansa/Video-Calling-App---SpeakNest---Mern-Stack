@@ -101,10 +101,10 @@ const login = asyncHandler(async (req, res) => {
   );
 
   const options = {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-  };
+  httpOnly: true,
+  secure: true,        
+  sameSite: "none",   
+};
 
   return res
     .status(200)
@@ -134,11 +134,11 @@ const logout = asyncHandler(async (req, res) => {
     { new: true },
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-  };
+ const options = {
+  httpOnly: true,
+  secure: true,      
+  sameSite: "none",    
+};
 
   return res
     .status(200)
