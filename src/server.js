@@ -16,13 +16,7 @@ app.use(
     credentials: true,
   }),
 );
-// Health check route
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "SpeakNest Backend Running Successfully",
-  });
-});
+
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
